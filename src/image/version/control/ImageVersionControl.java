@@ -5,6 +5,7 @@ class ImageVersionControl
 {
     
     public static double[][] forwardDCTExtreme(float input[][]) {
+    
     int N=8;
     double output[][] = new double[N][N];
     int v, u, x, y;
