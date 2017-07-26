@@ -68,6 +68,10 @@ public class java {
        
  }
  
+ public static void compressRGB(byte[] index,byte[] RGB)
+ {
+     
+ }
  public static void addTailer(int sTail, int EOI, byte[] data,BufferedImage img)
  {
      byte[] tailer;
@@ -110,7 +114,8 @@ public class java {
      */
      byte index[] = new byte[1000*4];
      int k=0;
-     for(int i=2000;i<3000;i++)
+     int i;
+     for( i=2000;i<3000;i++)
      {
          index[k] = (byte)(i>>> 24);k++;
          index[k] = (byte)(i>>> 16);k++;
@@ -124,6 +129,20 @@ public class java {
          RGBlength = (int)(Math.ceil((double)(indexLength/4)/64)*64)*3;
      }
      byte RGB[] = new byte[RGBlength];
+     
+     for(i=0;i<(index.length/4)*3;i++)
+     {
+         RGB[i]=(byte)252;i++;
+         RGB[i]=(byte)252;i++;
+         RGB[i]=(byte)252;
+     }
+     int j;
+     for(j=i;j<RGBlength;j++)
+     {
+         RGB[j]=(byte)128;j++;
+         RGB[j]=(byte)128;j++;
+         RGB[j]=(byte)128;
+     }
      System.out.println("RGBlength: "+RGBlength);
      byte[] description;
      System.out.println("Enter Description about Image: ");
@@ -131,6 +150,8 @@ public class java {
      description = str.getBytes();
      System.out.println("Description length: "+description.length);
      System.out.println("Version: "+version+" Image width: "+changedWidth+" Image height:"+changedHeight);
+     System.out.println("Compressing RGB....");
+     compressRGB(index,RGB);
      //return tailer;
  }
  public static void main(String args[])
