@@ -263,10 +263,10 @@ public class java {
          ch = sc.next().charAt(0);
      }
      */
-     byte index[] = new byte[1000*4];
+     byte index[] = new byte[6000*4];
      int k=0;
      int i;
-     for( i=2000;i<3000;i++)
+     for( i=7000;i<13000;i++)
      {
          index[k] = (byte)(i>>> 24);k++;
          index[k] = (byte)(i>>> 16);k++;
@@ -275,7 +275,7 @@ public class java {
      }
      int indexLength = index.length;
      int RGBlength = (index.length/4)*3;
-     if(indexLength%64!=0)
+     if((indexLength/4)%64!=0)
      {
          RGBlength = (int)(Math.ceil((double)(indexLength/4)/64)*64)*3;
      }
@@ -283,9 +283,9 @@ public class java {
      
      for(i=0;i<(index.length/4)*3;i++)
      {
-         RGB[i]=(byte)152;i++;
-         RGB[i]=(byte)22;i++;
-         RGB[i]=(byte)52;
+         RGB[i]=(byte)255;i++;
+         RGB[i]=(byte)255;i++;
+         RGB[i]=(byte)255;
      }
      int j;
      for(j=i;j<RGBlength;j++)

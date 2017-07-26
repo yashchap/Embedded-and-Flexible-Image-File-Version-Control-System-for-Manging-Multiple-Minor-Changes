@@ -12,16 +12,19 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 public class ImageVersion extends Applet implements ActionListener{
    
     BufferedImage img,img2=null;
     byte[] data;
-    Button download;
+    Button download = new Button();
     int EOI,sTail,lock=0;
     byte[] index;
     int[] RGB;
@@ -127,6 +130,7 @@ public class ImageVersion extends Applet implements ActionListener{
                     this.add(button[i]);
 		}
             }
+       
     }
     
      public static float[][] iforwardDCTExtreme(int input[][]) 
@@ -319,7 +323,7 @@ public class ImageVersion extends Applet implements ActionListener{
                 index = new byte[(rgbs-inds)];
                 int RGBlength=0;
                 int indexLength = (rgbs-inds);
-                if(indexLength%64!=0)
+                if((indexLength/4)%64!=0)
                 {
                     RGBlength = (int)(Math.ceil((double)(indexLength/4)/64)*64)*3;
                 }
