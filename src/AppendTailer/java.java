@@ -37,7 +37,7 @@ public class java {
 	InputStream ios = null;
 	try 
         {
-            byte[] buffer = new byte[15144];
+            byte[] buffer = new byte[1514400];
             ous = new ByteArrayOutputStream();
             ios = new FileInputStream(file);
             int read = 0;
@@ -282,8 +282,8 @@ public class java {
      
      for(i=0;i<(index.length/4)*3;i++)
      {
-         RGB[i]=(byte)252;i++;
-         RGB[i]=(byte)252;i++;
+         RGB[i]=(byte)52;i++;
+         RGB[i]=(byte)22;i++;
          RGB[i]=(byte)252;
      }
      int j;
@@ -342,27 +342,27 @@ public class java {
             Scanner sc  = new Scanner(System.in);
             System.out.print("Enter File Name:(with Extention) ");
             String inputFile = sc.next();
-            data = readData(new File("D:\\BTECH\\Internship\\Image Version Control\\src\\image\\version\\control\\"+inputFile));
+            data = readData(new File("D:\\BTECH\\Internship\\Image Version Control\\src\\AppendTailer\\"+inputFile));
             BufferedImage img = null;
-            img = ImageIO.read(new File("D:\\BTECH\\Internship\\Image Version Control\\src\\image\\version\\control\\"+inputFile));
-            int i;
+            img = ImageIO.read(new File("D:\\BTECH\\Internship\\Image Version Control\\src\\AppendTailer\\"+inputFile));
+            int i,p=data.length;
             for(i=0;i<data.length;i++)
             {
                 finalData.add(data[i]);
                 if(data[i]==(byte)'E'&&data[i+1]==(byte)'O'&&data[i+2]==(byte)'I')
                 {
                     System.out.println("End of File Found(last index):"+(i+2));
-                    finalData.add(data[i+1]);
-                    break;
+                    p=i;
+                    //break;
                 }
             }
             int EOI;
-            if(i!=data.length)
+            if(p!=data.length)
             {
-                EOI = i+3;
+                EOI = p+3;
                 
                 System.out.println("Tailer Exist: (starting at)"+EOI);
-                System.err.println("Start adding Tailer from: "+data.length);
+                System.out.println("Start adding Tailer from: "+data.length);
                 //writeData(finalData);
 
             }
@@ -371,15 +371,19 @@ public class java {
                 finalData.add((byte)'E');
                 finalData.add((byte)'O');
                 finalData.add((byte)'I');
-                EOI = i+3;
+                EOI = p+3;
                 System.out.println("Tailer Not Exist: (add from)"+EOI);
                 //writeData(finalData);
             }
            int sTail=finalData.size();
            System.out.println("data length: "+data.length+" arraylist: "+finalData.size());
            byte[] tailer = addTailer(sTail,EOI,data,img);
-           
-           
+           for(i=0;i<tailer.length;i++)
+           {
+               finalData.add(tailer[i]);
+           }
+           System.out.println("Final File Size: "+(finalData.size()/1024));
+           writeData(finalData);
      } catch (Exception ex) {
             Logger.getLogger(java.class.getName()).log(Level.SEVERE, null, ex);
         }
