@@ -368,13 +368,13 @@ class ImageVersionControl
             
         }
         System.out.println("\n----------\n|Error: "+Math.round(error/64)+"|\n----------");
-        int value = 1024;
+        int value = 110240;
         byte byt[] ={
             (byte)(value >>> 24),
             (byte)(value >>> 16),
             (byte)(value >>> 8),
             (byte)value};
-        int value2 = byt[0] << 24 | (byt[1] & 0xFF) << 16 | (byt[2] & 0xFF) << 8 | (byt[3] & 0xFF);
+        int value2 = (byt[0]) << 24 | (byt[1] & 0xFF) << 16 | (byt[2] & 0xFF) << 8 | (byt[3] & 0xFF);
         System.out.println(value2);
         String str = "Yash";
         byte[] des = str.getBytes();
@@ -386,5 +386,13 @@ class ImageVersionControl
         byte b = (byte)r;
         int ib = b & 0xFF;
         System.out.println(ib);
+        int wid = 800;
+        byte w[] = {
+        (byte)(wid >>> 8),
+            (byte)wid
+        };
+         value2 =   (w[0] &0xFF) << 8 | (w[1] & 0xFF);
+         System.out.println(value2);
+        
     }
 }

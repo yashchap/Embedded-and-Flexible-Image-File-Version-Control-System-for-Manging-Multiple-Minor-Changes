@@ -171,10 +171,11 @@ public class java {
     }
     return finalData;
  }
- public static void compressRGB(byte[] index,byte[] RGB)
+ public static byte[] compressRGB(byte[] index,byte[] RGB)
  {
      int i,R,G,B,k=0;
-     List<Byte> finalData = new ArrayList();
+     List<Byte> finalDataList = new ArrayList();
+     byte[] finalData;
      float YCC[] = new float[RGB.length];
      float Y[][] = new float[8][8];
      float Cb[][] = new float[8][8];
@@ -205,16 +206,23 @@ public class java {
         byte[] YCCc=compressMatrices(Y,Cb,Cr);
         for(byte b : YCCc) 
         {
-            finalData.add(new Byte(b));
+            finalDataList.add(new Byte(b));
         }
         System.out.println("Compressed Ycc length: "+YCCc.length);
         mat++;
         k--;
      }
      System.out.println("Total(8 x 8) Matrices formed: "+mat);
-     System.out.println("Total Compressed Data Length: "+finalData.size());
+     finalData = new byte[finalDataList.size()];
+     for(i=0;i<finalDataList.size();i++)
+     {
+         finalData[i] = finalDataList.get(i);
+     }
+     System.out.println("Total Compressed Data Length: "+finalData.length);
+     return finalData;
+
  }
- public static void addTailer(int sTail, int EOI, byte[] data,BufferedImage img)
+ public static byte[] addTailer(int sTail, int EOI, byte[] data,BufferedImage img)
  {
      byte[] tailer;
      int version=1;
@@ -293,8 +301,37 @@ public class java {
      System.out.println("Description length: "+description.length);
      System.out.println("Version: "+version+" Image width: "+changedWidth+" Image height:"+changedHeight);
      System.out.println("Compressing RGB....");
-     compressRGB(index,RGB);
-     //return tailer;
+     byte ImageData[] = compressRGB(index,RGB);
+     int tailerLength = 1+2+2+4+index.length+ImageData.length+description.length;
+     System.out.println("Total length of appended Tailer: "+tailerLength);
+     tailer = new byte[tailerLength];
+     k=0;
+     tailer[k] = (byte)version;k++; //version
+     //width
+     tailer[k] = (byte)(changedWidth >>> 8);k++;
+     tailer[k] = (byte)(changedWidth);k++;
+     //height
+     tailer[k] = (byte)(changedHeight >>> 8);k++;
+     tailer[k] = (byte)(changedHeight);k++;
+     //length
+     tailer[k] = (byte)(tailerLength >>> 24);k++;
+     tailer[k] = (byte)(tailerLength >>> 16);k++;
+     tailer[k] = (byte)(tailerLength >>> 8);k++;
+     tailer[k] = (byte)(tailerLength);k++;
+     for(i=0;i<index.length;i++)
+     {
+         tailer[k] = index[i];k++;
+     }
+     for(i=0;i<ImageData.length;i++)
+     {
+         tailer[k] = ImageData[i];k++;
+     }
+     for(i=0;i<description.length;i++)
+     {
+         tailer[k] = description[i];
+     }
+     System.out.println("Total length of appended Tailer: "+tailer.length);
+     return tailer;
  }
  public static void main(String args[])
  {
@@ -340,7 +377,8 @@ public class java {
             }
            int sTail=finalData.size();
            System.out.println("data length: "+data.length+" arraylist: "+finalData.size());
-           addTailer(sTail,EOI,data,img);
+           byte[] tailer = addTailer(sTail,EOI,data,img);
+           
            
      } catch (Exception ex) {
             Logger.getLogger(java.class.getName()).log(Level.SEVERE, null, ex);
