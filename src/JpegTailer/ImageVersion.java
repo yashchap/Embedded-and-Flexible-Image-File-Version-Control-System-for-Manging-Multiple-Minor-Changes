@@ -2,20 +2,27 @@ package JpegTailer;
 
 import static AppendTailer.java.readData;
 import java.applet.Applet;
+import java.awt.Button;
 import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import javax.imageio.ImageIO;
-public class ImageVersion extends Applet {
+public class ImageVersion extends Applet implements ActionListener{
    
     BufferedImage img,img2=null;
     byte[] data;
     int EOI,sTail;
+    List<Byte> index = new ArrayList();
+    List<Byte> RGB = new ArrayList();
     public static byte[] readData(File file) throws Exception 
     {
         ByteArrayOutputStream ous = null;
@@ -55,6 +62,27 @@ public class ImageVersion extends Applet {
         }
         return version;
     }
+    public void addButtons(int nTailer)
+    {
+        Button button[] = new Button[nTailer];
+            if(nTailer!=0)
+            {
+                for(int i=0;i<nTailer;i++)
+                {
+                    button[i] = new Button();
+                    button[i].setLabel("version "+i);
+                    button[i].setLocation(600, 50+(i*10));
+                    button[i].addActionListener(this);
+                    this.add(button[i]);
+		}
+            }
+    }
+    public void actionPerformed(ActionEvent ae)
+	{
+            String str  = ae.getActionCommand();
+            str = str.substring(8);
+            int version = Integer.parseInt(str);
+        }
     public void init() {
             try{
             Scanner sc  = new Scanner(System.in);
@@ -83,7 +111,7 @@ public class ImageVersion extends Applet {
             }
            sTail=data.length;
            int nButtons = getTailerButtons(data);
-           
+           addButtons(nButtons);
            System.out.println("Total Available Version: "+nButtons);
             }
             catch(Exception e){System.out.println(e);}

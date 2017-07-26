@@ -282,9 +282,9 @@ public class java {
      
      for(i=0;i<(index.length/4)*3;i++)
      {
-         RGB[i]=(byte)252;i++;
-         RGB[i]=(byte)252;i++;
-         RGB[i]=(byte)252;
+         RGB[i]=(byte)152;i++;
+         RGB[i]=(byte)22;i++;
+         RGB[i]=(byte)25;
      }
      int j;
      for(j=i;j<RGBlength;j++)
@@ -318,14 +318,20 @@ public class java {
      tailer[k] = (byte)(tailerLength >>> 16);k++;
      tailer[k] = (byte)(tailerLength >>> 8);k++;
      tailer[k] = (byte)(tailerLength);k++;
+     tailer[k] = (byte)'I';k++;
+     tailer[k] = (byte)'N';k++;
      for(i=0;i<index.length;i++)
      {
          tailer[k] = index[i];k++;
      }
+     tailer[k] = (byte)'C';k++;
+     tailer[k] = (byte)'D';k++;
      for(i=0;i<ImageData.length;i++)
      {
          tailer[k] = ImageData[i];k++;
      }
+     tailer[k] = (byte)'D';k++;
+     tailer[k] = (byte)'S';k++;
      for(i=0;i<description.length;i++)
      {
          tailer[k] = description[i];
