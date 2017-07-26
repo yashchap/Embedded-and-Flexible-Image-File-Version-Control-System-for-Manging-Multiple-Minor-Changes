@@ -3,6 +3,7 @@ package JpegTailer;
 import static AppendTailer.java.readData;
 import java.applet.Applet;
 import java.awt.Button;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -20,6 +21,7 @@ public class ImageVersion extends Applet implements ActionListener{
    
     BufferedImage img,img2=null;
     byte[] data;
+    Button download;
     int EOI,sTail,lock=0;
     byte[] index;
     int[] RGB;
@@ -62,6 +64,25 @@ public class ImageVersion extends Applet implements ActionListener{
 	g.drawImage(img,0,0,null);
     }
    
+    public void changeImage(Graphics g)
+    {
+        img2 = img;
+        int width = img2.getWidth(null);
+        int k=0;
+        for(int i=0;i<index.length;i+=4)
+        {
+            int ind = (index[0+i]) << 24 | (index[1+i] & 0xFF) << 16 | (index[2+i] & 0xFF) << 8 | (index[3+i] & 0xFF);
+            int xpos = ind % width;
+            int ypos = (int)Math.ceil((double)ind/width);
+            int R = RGB[k];k++;
+            int G = RGB[k];k++;
+            int B = RGB[k];k++;
+            int rgb = new Color(R,G,B).getRGB();
+            img2.setRGB(xpos,ypos,rgb);
+            g.drawImage(img2,0,0,null);
+        }
+        
+    }
     public int getTailerButtons(byte[] data)
     {
         int version=1;
@@ -359,6 +380,10 @@ public class ImageVersion extends Applet implements ActionListener{
         {
             drawImage(g);
             lock=1;
+        }
+        else
+        {
+            changeImage(g);
         }
     }
 }
