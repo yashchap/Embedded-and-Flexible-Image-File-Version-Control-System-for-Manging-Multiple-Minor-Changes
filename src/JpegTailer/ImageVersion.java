@@ -28,6 +28,12 @@ public class ImageVersion extends Applet implements ActionListener{
     List<Integer> tailerStart = new ArrayList();
     List<Integer> RGBStart = new ArrayList();
     List<Integer> descriptionStart = new ArrayList();
+    int Yquant[]={16,11,10,16,24,40,51,61,12,12,14,19,26,58,60,55,14,13,16,24,40,57,69,56,14,17,22,29,51,87,80,62,18,22,37,56,68,109,103,77,24,35,55,64,81,104,113,92,49,64,78,87,103,121,120,101,72,92,95,98,112,100,103,99};
+    int Cquant[] = {17,18,24,47,99,99,99,99,18,21,26,66,99,99,99,99,24,26,56,99,99,99,99,99,47,67,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99};   
+    int[] jpegNaturalOrder = { 0, 1, 8, 16, 9, 2, 3, 10, 17, 24, 32, 25, 18, 11, 4, 5,
+      12, 19, 26, 33, 40, 48, 41, 34, 27, 20, 13, 6, 7, 14, 21, 28, 35, 42, 49, 56, 57, 50, 43, 36,
+      29, 22, 15, 23, 30, 37, 44, 51, 58, 59, 52, 45, 38, 31, 39, 46, 53, 60, 61, 54, 47, 55, 62,
+      63 };
     public static byte[] readData(File file) throws Exception 
     {
         ByteArrayOutputStream ous = null;
@@ -101,6 +107,86 @@ public class ImageVersion extends Applet implements ActionListener{
 		}
             }
     }
+    public int decompressMatrix(byte[] Matrix,int grp)
+    {
+        System.out.println("DecompressMatrix");
+        int i;
+        if(grp==1)
+        {
+           int[] quant = Yquant;
+        }
+        else if(grp==2||grp==3)
+        {
+            int[] quant = Cquant;
+        }
+        for(i=0;i<Matrix.length;i++)
+        {
+           System.out.print(" "+Matrix[i]);
+        }
+        System.out.println();
+        return 0;
+    }
+    public int decompressMatrices(List<Byte> compressedMatrices)
+    {
+        System.out.println("DecompressMatrices");
+        byte[] Matrix = new byte[64];
+        int ord=0;
+        int grp = 1;
+        int i;
+        for(i=0;i<compressedMatrices.size();i+=2)
+        {
+            //System.out.print(" "+compressedMatrices.get(i)+" "+compressedMatrices.get(i+1));
+            if(compressedMatrices.get(i)==0&&compressedMatrices.get(i+1)==0)
+            {
+               while(ord!=64)
+               {
+                   Matrix[ord] = (byte)0;ord++;
+               }
+               ord=0;
+               decompressMatrix(Matrix,grp);
+               System.out.println();
+               grp++;
+               if(grp==4)
+               {
+                   grp=1;
+               }
+            }
+            else
+            {
+               Matrix[ord] = compressedMatrices.get(i);ord++;
+               Matrix[ord] = compressedMatrices.get(i+1);ord++;
+            }
+        }
+        return 0;
+    }
+    public int decompressData(byte[] compressedData)
+    {
+        int i;
+        int mat=0;
+        List<Byte> Matrices = new ArrayList();
+        for(i=0;i<compressedData.length;i+=2)
+        {
+            if(compressedData[i]==0&&compressedData[i+1]==0)
+            {
+               Matrices.add(compressedData[i]);
+               Matrices.add(compressedData[i+1]);
+               mat++;
+               if(mat==3)
+               {
+                   decompressMatrices(Matrices);
+                   mat=0;
+               }
+            }
+            else
+            {
+               Matrices.add(compressedData[i]);
+               Matrices.add(compressedData[i+1]);
+            }
+        }
+        System.out.println("Total Matrices: "+mat);
+        return 0;
+    }
+    
     public void actionPerformed(ActionEvent ae)
 	{
             String str  = ae.getActionCommand();
@@ -118,7 +204,24 @@ public class ImageVersion extends Applet implements ActionListener{
                 {
                     System.out.print((char)data[i]);
                 }
-                
+                System.out.println();
+                int inds = indexStart.get(version-1);
+                int rgbs = RGBStart.get(version-1);
+                System.out.println("Index Length: "+(rgbs-inds));
+                index = new byte[(rgbs-inds)];
+                int k=0;
+                for(int i=inds;i<rgbs;i++)
+                {
+                    index[k] = data[i];k++;
+                }
+                System.out.println("Compress Data Length: "+(startDes-rgbs-2));
+                byte[] compressedData = new byte[(startDes-rgbs-2)];
+                k=0;
+                for(int i=(rgbs+2);i<startDes;i++)
+                {
+                    compressedData[k] = data[i];k++;
+                }
+                decompressData(compressedData);
             }
         }
     public void init() {
