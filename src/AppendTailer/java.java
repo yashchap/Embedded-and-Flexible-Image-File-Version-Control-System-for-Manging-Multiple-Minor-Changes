@@ -282,9 +282,9 @@ public class java {
      
      for(i=0;i<(index.length/4)*3;i++)
      {
-         RGB[i]=(byte)252;i++;
-         RGB[i]=(byte)252;i++;
-         RGB[i]=(byte)252;
+         RGB[i]=(byte)122;i++;
+         RGB[i]=(byte)22;i++;
+         RGB[i]=(byte)52;
      }
      int j;
      for(j=i;j<RGBlength;j++)
@@ -332,7 +332,7 @@ public class java {
      tailer[k] = (byte)'S';k++;
      for(i=0;i<description.length;i++)
      {
-         tailer[k] = description[i];
+         tailer[k] = description[i];k++;
      }
      System.out.println("Total length of appended Tailer: "+tailer.length);
      return tailer;

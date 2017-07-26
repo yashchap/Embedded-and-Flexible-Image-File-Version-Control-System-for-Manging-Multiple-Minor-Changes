@@ -20,9 +20,14 @@ public class ImageVersion extends Applet implements ActionListener{
    
     BufferedImage img,img2=null;
     byte[] data;
-    int EOI,sTail;
-    List<Byte> index = new ArrayList();
-    List<Byte> RGB = new ArrayList();
+    int EOI,sTail,lock=0;
+    byte[] index;
+    byte[] RGB;
+    byte[] description;
+    List<Integer> indexStart = new ArrayList();
+    List<Integer> tailerStart = new ArrayList();
+    List<Integer> RGBStart = new ArrayList();
+    List<Integer> descriptionStart = new ArrayList();
     public static byte[] readData(File file) throws Exception 
     {
         ByteArrayOutputStream ous = null;
@@ -56,10 +61,29 @@ public class ImageVersion extends Applet implements ActionListener{
         int version=1;
         while(EOI!=sTail)
         {
+            
             version++;
             int tLength = data[EOI+5] << 24 | (data[EOI+6] & 0xFF) << 16 | (data[EOI+7] & 0xFF) << 8 | (data[EOI+8] & 0xFF);
+            indexStart.add(EOI+9);
+            System.out.println("Index start: "+(EOI+9));
+            for(int i=(EOI+9);i<(EOI+tLength);i++)
+            {
+                if(data[i]==(char)'C'&&data[i+1]==(char)'D')
+                {
+                    RGBStart.add(i);
+                    System.out.println("RGB start: "+(i));
+                }
+                else if(data[i]==(char)'D'&&data[i+1]==(char)'S')
+                {
+                    descriptionStart.add(i);
+                    System.out.println("Description start: "+(i));
+                }
+            }
             EOI = EOI + tLength;
+            tailerStart.add(EOI);
+            System.out.println("tailer start: "+(EOI));
         }
+        
         return version;
     }
     public void addButtons(int nTailer)
@@ -82,6 +106,20 @@ public class ImageVersion extends Applet implements ActionListener{
             String str  = ae.getActionCommand();
             str = str.substring(8);
             int version = Integer.parseInt(str);
+            if(version==0)
+            {
+                lock=0;
+                repaint();
+            }
+            else
+            {
+                int startDes = descriptionStart.get(version-1);
+                for(int i=(startDes+2);i<tailerStart.get(version-1);i++)
+                {
+                    System.out.print((char)data[i]);
+                }
+                
+            }
         }
     public void init() {
             try{
@@ -118,6 +156,10 @@ public class ImageVersion extends Applet implements ActionListener{
     }
     public void paint(Graphics g)
     {
-        drawImage(g);
+        if(lock==0)
+        {
+            drawImage(g);
+            lock=1;
+        }
     }
 }
