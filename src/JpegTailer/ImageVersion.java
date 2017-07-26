@@ -107,23 +107,76 @@ public class ImageVersion extends Applet implements ActionListener{
 		}
             }
     }
+    
+     public static float[][] iforwardDCTExtreme(int input[][]) 
+     {
+        int N=8;
+        float output[][] = new float[N][N];
+        int v=0, u, x, y;
+        for (x = 0; x < 8; x++) {
+            for (y = 0; y < 8; y++) {
+               for (u = 0; u < 8; u++) {
+                 for (v = 0; v < 8; v++) {
+              //input[x][y] -=128; 
+                    output[x][y] += input[u][v]
+                    * Math.cos(((double) (2 * x + 1) * (double) u * Math.PI) / 16)
+                    * Math.cos(((double) (2 * y + 1) * (double) v * Math.PI) / 16)*((u == 0) ? (1.0 / Math.sqrt(2)) : (double) 1.0)
+                    * ((v == 0) ? (1.0 / Math.sqrt(2)) : (double) 1.0);
+                    }
+                }
+                output[x][y] *= (0.25) ;
+             }
+            }
+        return output;
+     }
+    
     public int decompressMatrix(byte[] Matrix,int grp)
     {
         System.out.println("DecompressMatrix");
-        int i;
+        int i,j;
+        byte[] serializeData = new byte[64];
+        int[] quant = new int[64];
         if(grp==1)
         {
-           int[] quant = Yquant;
+           quant = Yquant;
         }
         else if(grp==2||grp==3)
         {
-            int[] quant = Cquant;
+            quant = Cquant;
         }
         for(i=0;i<Matrix.length;i++)
         {
-           System.out.print(" "+Matrix[i]);
+            serializeData[jpegNaturalOrder[i]] = Matrix[i];
+            //System.out.print(" "+serializeData[i]);
         }
-        System.out.println();
+        //System.out.println();
+        int compressedData[][] = new int[8][8];
+        int quantize[][] = new int[8][8];
+        int k=0;
+        for(i=0;i<8;i++)
+        {
+            for(j=0;j<8;j++)
+            {
+                compressedData[i][j] = serializeData[k];
+                quantize[i][j]=(Math.round(compressedData[i][j]*quant[k]));
+                k++;
+                //System.out.print(" "+compressedData[i][j]);
+            }
+            //System.out.println();
+        }
+        float DCTArray[][] = iforwardDCTExtreme(quantize);
+        int finalData[][] = new int[8][8];
+        for(i=0;i<8;i++)
+        {
+            for(j=0;j<8;j++)
+            {
+               finalData[i][j] = (Math.round(DCTArray[i][j])+128);
+               System.out.print(" "+finalData[i][j]);
+            }
+             System.out.println();
+            
+        }
+       
         return 0;
     }
     public int decompressMatrices(List<Byte> compressedMatrices)
@@ -138,13 +191,14 @@ public class ImageVersion extends Applet implements ActionListener{
             //System.out.print(" "+compressedMatrices.get(i)+" "+compressedMatrices.get(i+1));
             if(compressedMatrices.get(i)==0&&compressedMatrices.get(i+1)==0)
             {
-               while(ord!=64)
+               
+               while(ord<64)
                {
                    Matrix[ord] = (byte)0;ord++;
                }
                ord=0;
                decompressMatrix(Matrix,grp);
-               System.out.println();
+               
                grp++;
                if(grp==4)
                {
@@ -153,8 +207,14 @@ public class ImageVersion extends Applet implements ActionListener{
             }
             else
             {
-               Matrix[ord] = compressedMatrices.get(i);ord++;
-               Matrix[ord] = compressedMatrices.get(i+1);ord++;
+                int nZeros =compressedMatrices.get(i);
+                
+                while(nZeros>0)
+                   {
+                       Matrix[ord] = (byte)0;ord++;
+                       nZeros--;
+                   }    
+                Matrix[ord] = compressedMatrices.get(i+1);ord++;
             }
         }
         return 0;
@@ -173,7 +233,10 @@ public class ImageVersion extends Applet implements ActionListener{
                mat++;
                if(mat==3)
                {
+                   
                    decompressMatrices(Matrices);
+                   System.out.println();
+                   Matrices.clear();
                    mat=0;
                }
             }
@@ -183,7 +246,7 @@ public class ImageVersion extends Applet implements ActionListener{
                Matrices.add(compressedData[i+1]);
             }
         }
-        System.out.println("Total Matrices: "+mat);
+        System.out.println("Total Matrices: "+mat+" "+Matrices.size());
         return 0;
     }
     

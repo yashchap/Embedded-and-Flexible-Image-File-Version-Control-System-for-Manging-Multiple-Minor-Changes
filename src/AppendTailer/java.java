@@ -140,6 +140,7 @@ public class java {
               k++;
               finalData[k]=(byte)serializeData[i];
               k++;
+              numberOfZeros=0;
           }
       }
       finalData[k] = (byte)0;k++;
@@ -282,7 +283,7 @@ public class java {
      
      for(i=0;i<(index.length/4)*3;i++)
      {
-         RGB[i]=(byte)122;i++;
+         RGB[i]=(byte)152;i++;
          RGB[i]=(byte)22;i++;
          RGB[i]=(byte)52;
      }

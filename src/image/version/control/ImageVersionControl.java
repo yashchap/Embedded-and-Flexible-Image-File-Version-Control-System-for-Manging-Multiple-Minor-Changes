@@ -187,7 +187,7 @@ class ImageVersionControl
             data[i] = (float)252;
         for(int i=40;i<64;i++)
         {
-            data[i]=(float)0;
+            data[i]=(float)252;
         }
           byte quant[]={16,11,10,16,24,40,51,61,12,12,14,19,26,58,60,55,14,13,16,24,40,57,69,56,14,17,22,29,51,87,80,62,18,22,37,56,68,109,103,77,24,35,55,64,81,104,113,92,49,64,78,87,103,121,120,101,72,92,95,98,112,100,103,99};
      /*  byte[] quant = new byte[64];
@@ -393,6 +393,8 @@ class ImageVersionControl
         };
          value2 =   (w[0] &0xFF) << 8 | (w[1] & 0xFF);
          System.out.println(value2);
-        
+        b = (byte)-127;
+        int d =b;
+        System.out.println(d);
     }
 }
