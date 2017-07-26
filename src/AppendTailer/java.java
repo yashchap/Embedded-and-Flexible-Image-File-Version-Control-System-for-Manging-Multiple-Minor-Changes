@@ -148,18 +148,33 @@ public class java {
       return finalData;
  }
          
- public static void compressMatrices(float[][] Y,float[][] Cb,float[][] Cr)
+ public static byte[] compressMatrices(float[][] Y,float[][] Cb,float[][] Cr)
  {
     int Yquant[]={16,11,10,16,24,40,51,61,12,12,14,19,26,58,60,55,14,13,16,24,40,57,69,56,14,17,22,29,51,87,80,62,18,22,37,56,68,109,103,77,24,35,55,64,81,104,113,92,49,64,78,87,103,121,120,101,72,92,95,98,112,100,103,99};
     int Cquant[] = {17,18,24,47,99,99,99,99,18,21,26,66,99,99,99,99,24,26,56,99,99,99,99,99,47,67,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99};   
     byte[] Yc = compressMatrix(Y,Yquant);
     byte[] Cbc = compressMatrix(Cb,Cquant);
     byte[] Crc = compressMatrix(Cr,Cquant);
-    
+    byte[] finalData = new byte[Yc.length+Cbc.length+Crc.length];
+    int k=0;
+    for(int i=0;i<Yc.length;i++)
+    {
+        finalData[k]=Yc[i];k++;
+    }
+    for(int i=0;i<Cbc.length;i++)
+    {
+        finalData[k]=Cbc[i];k++;
+    }
+    for(int i=0;i<Crc.length;i++)
+    {
+        finalData[k]=Crc[i];k++;
+    }
+    return finalData;
  }
  public static void compressRGB(byte[] index,byte[] RGB)
  {
      int i,R,G,B,k=0;
+     List<Byte> finalData = new ArrayList();
      float YCC[] = new float[RGB.length];
      float Y[][] = new float[8][8];
      float Cb[][] = new float[8][8];
@@ -187,12 +202,17 @@ public class java {
          }
          
         }
-        compressMatrices(Y,Cb,Cr);
+        byte[] YCCc=compressMatrices(Y,Cb,Cr);
+        for(byte b : YCCc) 
+        {
+            finalData.add(new Byte(b));
+        }
+        System.out.println("Compressed Ycc length: "+YCCc.length);
         mat++;
         k--;
      }
      System.out.println("Total(8 x 8) Matrices formed: "+mat);
-     
+     System.out.println("Total Compressed Data Length: "+finalData.size());
  }
  public static void addTailer(int sTail, int EOI, byte[] data,BufferedImage img)
  {
