@@ -282,8 +282,8 @@ public class java {
      
      for(i=0;i<(index.length/4)*3;i++)
      {
-         RGB[i]=(byte)52;i++;
-         RGB[i]=(byte)22;i++;
+         RGB[i]=(byte)252;i++;
+         RGB[i]=(byte)252;i++;
          RGB[i]=(byte)252;
      }
      int j;
