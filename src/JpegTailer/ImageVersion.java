@@ -22,7 +22,7 @@ public class ImageVersion extends Applet implements ActionListener{
     byte[] data;
     int EOI,sTail,lock=0;
     byte[] index;
-    byte[] RGB;
+    int[] RGB;
     byte[] description;
     List<Integer> indexStart = new ArrayList();
     List<Integer> tailerStart = new ArrayList();
@@ -130,9 +130,9 @@ public class ImageVersion extends Applet implements ActionListener{
         return output;
      }
     
-    public int decompressMatrix(byte[] Matrix,int grp)
+    public int[] decompressMatrix(byte[] Matrix,int grp)
     {
-        System.out.println("DecompressMatrix");
+        //System.out.println("DecompressMatrix");
         int i,j;
         byte[] serializeData = new byte[64];
         int[] quant = new int[64];
@@ -166,26 +166,31 @@ public class ImageVersion extends Applet implements ActionListener{
         }
         float DCTArray[][] = iforwardDCTExtreme(quantize);
         int finalData[][] = new int[8][8];
+        int finalDatalist[] = new int[64];
+        k=0;
         for(i=0;i<8;i++)
         {
             for(j=0;j<8;j++)
             {
                finalData[i][j] = (Math.round(DCTArray[i][j])+128);
-               System.out.print(" "+finalData[i][j]);
+               //System.out.print(" "+finalData[i][j]);
+               finalDatalist[k] = finalData[i][j];k++;
             }
-             System.out.println();
+             //System.out.println();
             
         }
        
-        return 0;
+        return finalDatalist;
     }
-    public int decompressMatrices(List<Byte> compressedMatrices)
+    public int[] decompressMatrices(List<Byte> compressedMatrices)
     {
-        System.out.println("DecompressMatrices");
+        //System.out.println("DecompressMatrices");
         byte[] Matrix = new byte[64];
         int ord=0;
         int grp = 1;
         int i;
+        int finalData[] = new int[192];
+        int k=0;
         for(i=0;i<compressedMatrices.size();i+=2)
         {
             //System.out.print(" "+compressedMatrices.get(i)+" "+compressedMatrices.get(i+1));
@@ -197,8 +202,8 @@ public class ImageVersion extends Applet implements ActionListener{
                    Matrix[ord] = (byte)0;ord++;
                }
                ord=0;
-               decompressMatrix(Matrix,grp);
-               
+               int M[] = decompressMatrix(Matrix,grp);
+               for(int p=0;p<M.length;p++){ finalData[k] = M[p];k++;}
                grp++;
                if(grp==4)
                {
@@ -217,12 +222,28 @@ public class ImageVersion extends Applet implements ActionListener{
                 Matrix[ord] = compressedMatrices.get(i+1);ord++;
             }
         }
-        return 0;
+        int[] RGB = new int[192];
+        k=0;
+        for(i=0;i<64;i++)
+        {
+            float Y = (float)finalData[i];
+            float Cb = (float)finalData[i+64];
+            float Cr = (float)finalData[i+128];
+            int r = (int)(Y + 1.40200 * (Cr - 0x80));
+            int g = (int)(int)(Y - 0.34414 * (Cb - 0x80) - 0.71414 * (Cr - 0x80));
+            int b = (int)(int)(Y + 1.77200 * (Cb - 0x80));
+            RGB[k]  = Math.max(0, Math.min(255, r));k++;
+            RGB[k]  = Math.max(0, Math.min(255, g));k++;
+            RGB[k]  = Math.max(0, Math.min(255, b));k++;
+        }
+        
+        return RGB;
     }
-    public int decompressData(byte[] compressedData)
+    public void decompressData(byte[] compressedData)
     {
         int i;
         int mat=0;
+        int k=0;
         List<Byte> Matrices = new ArrayList();
         for(i=0;i<compressedData.length;i+=2)
         {
@@ -234,8 +255,11 @@ public class ImageVersion extends Applet implements ActionListener{
                if(mat==3)
                {
                    
-                   decompressMatrices(Matrices);
-                   System.out.println();
+                   int M[] = decompressMatrices(Matrices);
+                   for(int p=0;p<M.length;p++){
+                    RGB[k] = M[p];k++;
+                    }
+                   
                    Matrices.clear();
                    mat=0;
                }
@@ -246,8 +270,8 @@ public class ImageVersion extends Applet implements ActionListener{
                Matrices.add(compressedData[i+1]);
             }
         }
-        System.out.println("Total Matrices: "+mat+" "+Matrices.size());
-        return 0;
+        System.out.println("Total Matrices: "+mat+" "+Matrices.size()+" k: "+k);
+        
     }
     
     public void actionPerformed(ActionEvent ae)
@@ -272,6 +296,13 @@ public class ImageVersion extends Applet implements ActionListener{
                 int rgbs = RGBStart.get(version-1);
                 System.out.println("Index Length: "+(rgbs-inds));
                 index = new byte[(rgbs-inds)];
+                int RGBlength=0;
+                int indexLength = (rgbs-inds);
+                if(indexLength%64!=0)
+                {
+                    RGBlength = (int)(Math.ceil((double)(indexLength/4)/64)*64)*3;
+                }
+                RGB = new int[RGBlength];
                 int k=0;
                 for(int i=inds;i<rgbs;i++)
                 {
@@ -285,6 +316,8 @@ public class ImageVersion extends Applet implements ActionListener{
                     compressedData[k] = data[i];k++;
                 }
                 decompressData(compressedData);
+                lock=1;
+                repaint();
             }
         }
     public void init() {

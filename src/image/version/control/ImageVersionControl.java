@@ -396,5 +396,10 @@ class ImageVersionControl
         b = (byte)-127;
         int d =b;
         System.out.println(d);
+        int Y  = 252;
+        int Cb=128,Cr=128;
+            System.out.print(" "+(int)(Y + 1.40200 * (Cr - 0x80)));
+           System.out.print(" "+(int)(Y - 0.34414 * (Cb - 0x80) - 0.71414 * (Cr - 0x80)));
+            System.out.println(" "+(int)(Y + 1.77200 * (Cb - 0x80)));
     }
 }
