@@ -372,7 +372,7 @@ class ImageVersionControl
             
         }
         System.out.println("\n----------\n|Error: "+Math.round(error/64)+"|\n----------");
-        int value = 24;
+        int value = 1024;
         byte byt[] ={
             (byte)(value >>> 24),
             (byte)(value >>> 16),
@@ -386,5 +386,9 @@ class ImageVersionControl
         {
             System.out.print((char)(des[i]));
         }
+        int r = 0;
+        byte b = (byte)r;
+        int ib = b & 0xFF;
+        System.out.println(ib);
     }
 }

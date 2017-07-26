@@ -70,6 +70,18 @@ public class java {
  
  public static void compressRGB(byte[] index,byte[] RGB)
  {
+     int i,R,G,B,k=0;
+     float YCC[] = new float[RGB.length];
+     for(i=0;i<RGB.length;i++)
+     {
+         R = RGB[i] & 0xFF;i++;
+         G = RGB[i] & 0xFF;i++;
+         B = RGB[i] & 0xFF;
+         YCC[k] = (float)(0.299*R+0.587*G+0.114*B);k++;
+         YCC[k]=(float)(-0.169*R-0.331*G+0.5*B + 128.0);k++;
+         YCC[k]=(float)(0.5*R-0.419*G-0.081*B + 128.0);k++;
+     }
+     System.out.println("YCC length: "+YCC.length);
      
  }
  public static void addTailer(int sTail, int EOI, byte[] data,BufferedImage img)
