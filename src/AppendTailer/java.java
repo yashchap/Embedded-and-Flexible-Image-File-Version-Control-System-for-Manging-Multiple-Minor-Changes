@@ -60,28 +60,32 @@ public class java {
             for(i=0;i<data.length;i++)
             {
                 finalData.add(data[i]);
-                if(data[i]==(byte)255&&data[i+1]==(byte)217)
+                if(data[i]==(byte)'E'&&data[i+1]==(byte)'O'&&data[i+2]==(byte)'I')
                 {
-                    System.out.println("End of File Found(last index):"+(i+1));
+                    System.out.println("End of File Found(last index):"+(i+2));
                     finalData.add(data[i+1]);
                     break;
                 }
             }
             int EOI;
+            int sTail=data.length;
             if(i!=data.length)
             {
-                EOI = data.length;
-                System.out.println("JPG Image: "+EOI);
-                 writeData(finalData,".jpg");
+                EOI = i+3;
+                
+                System.out.println("Tailer Exist: (starting at)"+EOI);
+                System.err.println("Start adding Tailer from: "+data.length);
+                //writeData(finalData,".jpg");
 
             }
             else
             {
-                finalData.add((byte)255);
-                finalData.add((byte)217);
-                EOI = data.length+2;
-                System.out.println("Other Format: "+EOI);
-                writeData(finalData,".bmp");
+                finalData.add((byte)'E');
+                finalData.add((byte)'O');
+                finalData.add((byte)'I');
+                EOI = i+3;
+                System.out.println("Tailer Not Exist: (add from)"+EOI);
+                //writeData(finalData,".png");
             }
            System.out.println("data length: "+data.length+" arraylist: "+finalData.size());
      } catch (Exception ex) {
