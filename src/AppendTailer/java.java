@@ -282,9 +282,9 @@ public class java {
      
      for(i=0;i<(index.length/4)*3;i++)
      {
-         RGB[i]=(byte)152;i++;
-         RGB[i]=(byte)22;i++;
-         RGB[i]=(byte)25;
+         RGB[i]=(byte)252;i++;
+         RGB[i]=(byte)252;i++;
+         RGB[i]=(byte)252;
      }
      int j;
      for(j=i;j<RGBlength;j++)
@@ -302,7 +302,7 @@ public class java {
      System.out.println("Version: "+version+" Image width: "+changedWidth+" Image height:"+changedHeight);
      System.out.println("Compressing RGB....");
      byte ImageData[] = compressRGB(index,RGB);
-     int tailerLength = 1+2+2+4+index.length+ImageData.length+description.length;
+     int tailerLength = 1+2+2+4+index.length+ImageData.length+description.length+4;
      System.out.println("Total length of appended Tailer: "+tailerLength);
      tailer = new byte[tailerLength];
      k=0;
@@ -318,8 +318,6 @@ public class java {
      tailer[k] = (byte)(tailerLength >>> 16);k++;
      tailer[k] = (byte)(tailerLength >>> 8);k++;
      tailer[k] = (byte)(tailerLength);k++;
-     tailer[k] = (byte)'I';k++;
-     tailer[k] = (byte)'N';k++;
      for(i=0;i<index.length;i++)
      {
          tailer[k] = index[i];k++;
