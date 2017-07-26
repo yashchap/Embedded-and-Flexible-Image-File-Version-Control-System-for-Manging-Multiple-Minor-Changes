@@ -68,10 +68,102 @@ public class java {
        
  }
  
+ public static double[][] forwardDCTExtreme(float input[][]) 
+ {
+    
+    int N=8;
+    double output[][] = new double[N][N];
+    int v, u, x, y;
+    for (v = 0; v < 8; v++) {
+      for (u = 0; u < 8; u++) {
+        for (x = 0; x < 8; x++) {
+          for (y = 0; y < 8; y++) {
+              input[x][y] -=128; 
+            output[v][u] += input[x][y]
+                * Math.cos(((double) (2 * x + 1) * (double) u * Math.PI) / 16)
+                * Math.cos(((double) (2 * y + 1) * (double) v * Math.PI) / 16);
+          }
+        }
+        output[v][u] *= (0.25) * ((u == 0) ? (1.0 / Math.sqrt(2)) : (double) 1.0)
+            * ((v == 0) ? (1.0 / Math.sqrt(2)) : (double) 1.0);
+      }
+    }
+    return output;
+  }
+ public static byte[] compressMatrix(float[][] M, int[] quant)
+ {
+      int[] jpegNaturalOrder = { 0, 1, 8, 16, 9, 2, 3, 10, 17, 24, 32, 25, 18, 11, 4, 5,
+      12, 19, 26, 33, 40, 48, 41, 34, 27, 20, 13, 6, 7, 14, 21, 28, 35, 42, 49, 56, 57, 50, 43, 36,
+      29, 22, 15, 23, 30, 37, 44, 51, 58, 59, 52, 45, 38, 31, 39, 46, 53, 60, 61, 54, 47, 55, 62,
+      63 };
+      double[][] DCTArraytemp;
+      double[][] DCTArray = new double[8][8];
+      DCTArraytemp = forwardDCTExtreme(M);
+      //System.out.println("DCT I: Cosine Transformation:\n");
+      int k=0;
+      int compressData[][] = new int[8][8];
+      int serializeTemp[] = new int[64];
+      for(int i=0;i<8;i++)
+        {
+            for(int j=0;j<8;j++)
+            {
+               DCTArray[i][j] = DCTArraytemp[j][i];
+               compressData[i][j] = (int)(Math.round(DCTArray[i][j]/quant[k]));
+               serializeTemp[k] = compressData[i][j];
+               k++;
+              
+            }
+           
+        }
+      k=0;
+      int serializeData[] = new int[64];
+      int nzeros=0,numberOfZeros=0;
+      for(int i=0;i<serializeTemp.length;i++)
+      {
+          serializeData[i]=serializeTemp[jpegNaturalOrder[i]];
+          if(serializeData[i]!=0)
+          {
+              nzeros++;
+          }
+      }
+      byte[] finalData = new byte[(nzeros*2)+2];
+      k=0;
+      for(int i=0;i<serializeTemp.length;i++)
+      {
+          if(serializeData[i]==0)
+          {
+              numberOfZeros++;
+          }
+          else
+          {
+              finalData[k]=(byte)numberOfZeros;
+              k++;
+              finalData[k]=(byte)serializeData[i];
+              k++;
+          }
+      }
+      finalData[k] = (byte)0;k++;
+      finalData[k]= (byte)0;
+      System.out.println("Final Compressed Data length: "+finalData.length);
+      return finalData;
+ }
+         
+ public static void compressMatrices(float[][] Y,float[][] Cb,float[][] Cr)
+ {
+    int Yquant[]={16,11,10,16,24,40,51,61,12,12,14,19,26,58,60,55,14,13,16,24,40,57,69,56,14,17,22,29,51,87,80,62,18,22,37,56,68,109,103,77,24,35,55,64,81,104,113,92,49,64,78,87,103,121,120,101,72,92,95,98,112,100,103,99};
+    int Cquant[] = {17,18,24,47,99,99,99,99,18,21,26,66,99,99,99,99,24,26,56,99,99,99,99,99,47,67,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99};   
+    byte[] Yc = compressMatrix(Y,Yquant);
+    byte[] Cbc = compressMatrix(Cb,Cquant);
+    byte[] Crc = compressMatrix(Cr,Cquant);
+    
+ }
  public static void compressRGB(byte[] index,byte[] RGB)
  {
      int i,R,G,B,k=0;
      float YCC[] = new float[RGB.length];
+     float Y[][] = new float[8][8];
+     float Cb[][] = new float[8][8];
+     float Cr[][] = new float[8][8];
      for(i=0;i<RGB.length;i++)
      {
          R = RGB[i] & 0xFF;i++;
@@ -82,6 +174,24 @@ public class java {
          YCC[k]=(float)(0.5*R-0.419*G-0.081*B + 128.0);k++;
      }
      System.out.println("YCC length: "+YCC.length);
+     int mat = 0;
+     for(k=0;k<YCC.length;k++)
+     {
+        for(int l=0;l<8;l++)
+        {
+         for(int m=0;m<8;m++)
+         {
+            Y[l][m] = YCC[k];k++;
+            Cb[l][m] = YCC[k];k++;
+            Cr[l][m] = YCC[k];k++;
+         }
+         
+        }
+        compressMatrices(Y,Cb,Cr);
+        mat++;
+        k--;
+     }
+     System.out.println("Total(8 x 8) Matrices formed: "+mat);
      
  }
  public static void addTailer(int sTail, int EOI, byte[] data,BufferedImage img)

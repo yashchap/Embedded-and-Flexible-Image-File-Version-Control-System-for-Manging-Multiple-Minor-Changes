@@ -190,33 +190,29 @@ class ImageVersionControl
             data[i]=(float)0;
         }
           byte quant[]={16,11,10,16,24,40,51,61,12,12,14,19,26,58,60,55,14,13,16,24,40,57,69,56,14,17,22,29,51,87,80,62,18,22,37,56,68,109,103,77,24,35,55,64,81,104,113,92,49,64,78,87,103,121,120,101,72,92,95,98,112,100,103,99};
-       
-     /*   quant[0] = 17;
-    quant[1] = 18;
-    quant[2] = 24;
-    quant[3] = 47;
+     /*  byte[] quant = new byte[64];
+       quant[0] = 17;quant[1] = 18;quant[2] = 24;quant[3] = 47;
     quant[4] = 99;
     quant[5] = 99;
     quant[6] = 99;
     quant[7] = 99;
-    quant[8] = 18;
-    quant[9] = 21;
-    quant[10] = 26;
-    quant[11] = 66;
+          
+    quant[8] = 18;quant[9] = 21; quant[10] = 26;quant[11] = 66;
     quant[12] = 99;
     quant[13] = 99;
     quant[14] = 99;
     quant[15] = 99;
-    quant[16] = 24;
-    quant[17] = 26;
-    quant[18] = 56;
+          
+    quant[16] = 24;    quant[17] = 26;    quant[18] = 56;
     quant[19] = 99;
     quant[20] = 99;
     quant[21] = 99;
     quant[22] = 99;
     quant[23] = 99;
+          
     quant[24] = 47;
     quant[25] = 66;
+          
     quant[26] = 99;
     quant[27] = 99;
     quant[28] = 99;
@@ -386,7 +382,7 @@ class ImageVersionControl
         {
             System.out.print((char)(des[i]));
         }
-        int r = 0;
+        int r = 255;
         byte b = (byte)r;
         int ib = b & 0xFF;
         System.out.println(ib);
